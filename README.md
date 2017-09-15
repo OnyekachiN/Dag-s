@@ -1,5 +1,100 @@
 # Dag-s
 This source script aims at creating a user-friendly web visualization tool DAGs (directed acyclic graph).
+//Html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Directed Graph Editor</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  
+  <body>
+  <div id="option">
+    <input name="updateButton" 
+           type="button" 
+           value="On" 
+           onclick="updateGrid()" >
+	<input name="updateButton" 
+			type="button"  
+			value="Off" 
+			onclick="updateGrid()">
+</div>
+  </body>
+
+ <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="working.js"></script>
+</html>
+	
+//CSS
+svg {
+  background-color: #FFF;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.grid line {
+  stroke: #ddd;
+}
+
+
+  svg:not(.active):not(.ctrl) {
+  cursor: crosshair;
+}
+
+path.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 4px;
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) path.link {
+  cursor: pointer;
+}
+
+path.link.selected {
+  stroke-dasharray: 10,2;
+}
+
+path.link.dragline {
+  pointer-events: none;
+  cursor: move;
+}
+
+path.link.hidden {
+  stroke-width: 0;
+}
+
+circle.node {
+  stroke-width: 1.5px;
+  cursor: pointer;
+}
+
+circle.node.reflexive {
+  stroke: #000 !important;
+  stroke-width: 2.5px;
+}
+
+text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+text.id {
+  text-anchor: middle;
+  font-weight: bold;
+}
+circle.node.draggable {
+    cursor: move;
+
+    }
+
+
 // set up SVG for D3
 
 var width  = 1500,
