@@ -1,33 +1,74 @@
+// set up SVG for D3
+var width = 1500,
+  height = 800,
+  colors = d3.scale.category20();
+
+var svg = d3.select('body')
+  .append('svg')
+  .attr('oncontextmenu', 'return false;')
+  .attr('width', width)
+  .attr('height', height);
+
+//vertical lines
+var ver = svg.selectAll(null).data(d3.range(26)).enter()
+  .append("line")
+  .attr("x1", function(d) {
+    return d * 80;
+  })
+  .attr("x2", function(d) {
+    return d * 80;
+  })
+  .attr("y1", function(d) {
+    return 0;
+  })
+  .attr("y2", function(d) {
+    return 800;
+  })
+  .style("stroke", "#ccc")
+  .style("shape-rendering", "crispEdges");
+
 // horizontal lines
 
-svg.selectAll(".vline").data(d3.range(26)).enter()
-    .append("line")
-    .attr("y1", function (d) {
+var hor = svg.selectAll(null).data(d3.range(26)).enter()
+  .append("line")
+  .attr("y1", function(d) {
     return d * 60;
-})
-    .attr("y2", function (d) {
+  })
+  .attr("y2", function(d) {
     return d * 60;
-})
-    .attr("x1", function (d) {
+  })
+  .attr("x1", function(d) {
     return 0;
-})
-    .attr("x2", function (d) {
+  })
+  .attr("x2", function(d) {
     return 1500;
+  })
+  .style("stroke", "#ccc")
+  .style("shape-rendering", "crispEdges");
+
+var toggle = true;
+
+d3.select("input").on("click", function() {
+  d3.selectAll("line").style("opacity", +(toggle = !toggle))
 })
-    .style("stroke", "#eee");
+
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 var nodes = [
-    {id: "DAG1", reflexive: false},
-    {id: "DAG2", reflexive: false},
-    {id: "DAG3", reflexive: false}
+    {id: "A", reflexive: false},
+    {id: "B", reflexive: false},
+    {id: "C", reflexive: false}
+	
+	
   ],
-  lastNodeId = 4,
+  lastNodeId = 3,
   links = [
     {source: nodes[0], target: nodes[1], left: true, right: true },
     {source: nodes[1], target: nodes[2], left: true, right: true }
+	
+	
 	
   ];
 
@@ -54,17 +95,19 @@ svg.append('svg:defs').append('svg:marker')
   .append('svg:path')
     .attr('d', 'M0,-5L10,0L0,5')
     .attr('fill', '#000');
-
+	
 svg.append('svg:defs').append('svg:marker')
-    .attr('id', 'start-arrow')
+    .attr('id', 'end-arrow')
     .attr('viewBox', '0 -5 10 10')
     .attr('refX', 12)
     .attr('markerWidth', 4)
     .attr('markerHeight', 4)
     .attr('orient', 'auto')
   .append('svg:path')
-    .attr('d', 'M10,-5L0,0L10,5')
+    .attr('d', 'M0,-5L10,0L0,5')
     .attr('fill', '#000');
+
+
 
 // line displayed when dragging new nodes
 var drag_line = svg.append('svg:path')
@@ -98,13 +141,20 @@ function tick() {
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
         normX = deltaX / dist,
         normY = deltaY / dist,
-        sourcePadding = d.left ? 15: 12,
-        targetPadding = d.right ? 15 : 12,
+        sourcePadding = d.left ? 18: 12,
+        targetPadding = d.right ? 18 : 12,
         sourceX = d.source.x + (sourcePadding * normX),
         sourceY = d.source.y + (sourcePadding * normY),
         targetX = d.target.x - (targetPadding * normX),
         targetY = d.target.y - (targetPadding * normY);
-    return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+   // return 'M' + sourceX    + ',' + sourceY    + 'L' + targetX + ',' + targetY;//original
+	//return "M" + d.source.x + "," + d.source.y + "A" + dist    + "," + dist   + " 0, 0,1 " + d.target.x  + ","  + d.target.y;   //d3noobs
+	  //return "M" + d[0].x     + "," + d[0].y     + "S" + d[1].x  + "," + d[1].y + " "       + d[2].x      + ","  + d[2].y;       //bl.org
+	//  return "M" + d[0].x     + "," + d[0].y     + "S" + dist  + "," + dist + " "       + d[2].x      + ","  + d[2].y;       //bl.org mod
+	  return "M" + sourceX + "," + sourceY + "S" + sourceX    + "," + dist   + " " + targetX + ","  + targetY;
+	  
+	  //M10,20S22,22
+
   });
   function positionLink(d) {
   return "M" + d[0].x + "," + d[0].y
@@ -183,7 +233,7 @@ function restart() {
 
   g.append('svg:circle')
     .attr('class', 'node')
-    .attr('r', 20)
+    .attr('r', 24)
 	.on("dblclick", dblclick)
 	.call(drag)
     .style('fill', function(d) { return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
@@ -252,7 +302,7 @@ function restart() {
       if(link) {
         link[direction] = true;
       } else {
-        link = {source: source, target: target, left: false, right: false};
+        link = {source: source, target: target, left: true, right: true};
         link[direction] = true;
         links.push(link);
       }
@@ -419,6 +469,17 @@ function keyup() {
     svg.classed('ctrl', false);
   }
 }
+//document.getElementById('updateButton').style.display='block'
+//document.getElementById('updateButton').style.display='none'
+
+d3.select('#option')
+    .on("click", function(updateGrid){
+      var o = d3.select('.fade_line').style('opacity') === "1" ? "0" : "1";
+	  d3.selectAll('.dot')
+        .style('opacity', o);
+      d3.selectAll('.fade_line')
+        .style('opacity', o);
+    });
 
 // app starts here
 svg.on('mousedown', mousedown)
@@ -428,3 +489,6 @@ d3.select(window)
   .on('keydown', keydown)
   .on('keyup', keyup);
 restart();
+
+
+
